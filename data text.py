@@ -15,7 +15,7 @@ def find_soil(x, y, raster_file):
     with rasterio.open(raster_file) as src:
         row, col = src.index(x, y)
         soil_val = src.read(1, window=((row, row + 1), (col, col + 1)))
-        print(f"{raster_file} content at point (): {soil_val[0][0]}")
+        print(f"{raster_file} content at point ({x}{y}): {soil_val[0][0]}")
         return soil_val
 
 
