@@ -1,8 +1,11 @@
+import pandas as pd
 import rasterio
 import geopandas as gpd
 from shapely import Point
+import json
 
 
+# Function to find coordinations from geojson
 def find_point(point):
     gdf = gpd.read_file("field_centroids.geojson")
     point = gdf.geometry.iloc[point]
@@ -10,6 +13,7 @@ def find_point(point):
     return x, y
 
 
+# Function to find soil for sand etc.
 def find_soil(x, y, raster_file):
     with rasterio.open(raster_file) as src:
         row, col = src.index(x, y)
@@ -18,17 +22,38 @@ def find_soil(x, y, raster_file):
         return soil_val
 
 
-pointX, pointY = find_point(0)
+# It's for find some need string in geojson
+with open('field_centroids.geojson') as f:
+    data = json.load(f)
+    first_feature = data['features'][0]
 
+id_json = first_feature['properties']['id']
+name_json = first_feature['properties']['Name']
+
+pointX, pointY = find_point(0)
 ball = Point(pointX, pointY)
 
 gdf = gpd.read_file("field_centroids.geojson")
 
-clay = find_soil(pointX, pointY, "./soil_data/clay.tif")[0][0]
-sand = find_soil(pointX, pointY, "./soil_data/sand.tif")[0][0]
-density = find_soil(pointX, pointY, "./soil_data/density.tif")[0][0]
-soil_moisture = find_soil(pointX, pointY, "soil_moisture.tif")[0][0]
+clay = int(find_soil(pointX, pointY, "./soil_data/clay.tif")[0][0])
+sand = int(find_soil(pointX, pointY, "./soil_data/sand.tif")[0][0])
+density = int(find_soil(pointX, pointY, "./soil_data/density.tif")[0][0])
+soil_moisture = int(find_soil(pointX, pointY, "soil_moisture.tif")[0][0])
+properties = {
+    'id': id_json,
+    'Name': name_json,
+    'soil': {
+        'clay': clay,
+        'sand': sand,
+        'density': density
+    },
+    'soil_moisture': soil_moisture,
+    'coordinates': {
+        'lat': pointX,
+        'lng': pointY
+    }
+}
 
-data_soil = {"clay": clay, "sand": sand, "density": density, "soil_moisture": soil_moisture}
-soils = gpd.GeoDataFrame([data_soil], geometry=[ball])
+# data_soil = pd.Series([clay, sand, density, soil_moisture], index=["clay", "sand", "density", "soil_moisture"])
+soils = gpd.GeoDataFrame(data=[properties], geometry=[ball])
 soils.to_file("output.geojson", driver="GeoJSON")
