@@ -22,16 +22,13 @@ pointX, pointY = find_point(0)
 
 ball = Point(pointX, pointY)
 
+gdf = gpd.read_file("field_centroids.geojson")
+
 clay = find_soil(pointX, pointY, "./soil_data/clay.tif")[0][0]
 sand = find_soil(pointX, pointY, "./soil_data/sand.tif")[0][0]
 density = find_soil(pointX, pointY, "./soil_data/density.tif")[0][0]
 soil_moisture = find_soil(pointX, pointY, "soil_moisture.tif")[0][0]
 
-data_soil = {
-    "clay": clay,
-    "sand": sand,
-    "density": density,
-    "soil_moisture": soil_moisture}
-
+data_soil = {"clay": clay, "sand": sand, "density": density, "soil_moisture": soil_moisture}
 soils = gpd.GeoDataFrame([data_soil], geometry=[ball])
 soils.to_file("output.geojson", driver="GeoJSON")
