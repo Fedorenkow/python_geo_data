@@ -1,8 +1,8 @@
+import os
 import rasterio
 from rasterio.features import shapes
 import geopandas as gpd
 from shapely.geometry import Point
-
 
 def find_point(point):
     gdf = gpd.read_file("field_centroids.geojson")
