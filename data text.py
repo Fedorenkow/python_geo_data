@@ -3,22 +3,22 @@ from rasterio.features import shapes
 import geopandas as gpd
 from shapely.geometry import Point
 
-def FindPoint(point):
+
+def find_point(point):
     gdf = gpd.read_file("field_centroids.geojson")
     point = gdf.geometry.iloc[point]
-    x = point.x, point.y
-    print(x)
-    return x
-
-with rasterio.open('./soil_moisture.tif') as src:
-    image = src.read(1)
-    results = (
-        {'properties': {'raster_val': v}, 'geometry': s}
-        for i, (s, v)
-        in enumerate(shapes(image, mask=None, transform=src.transform))
-    )
-
-point = FindPoint(0)
-print(point)
+    x, y = point.x, point.y
+    return x, y
 
 
+def find_soil(x, y, raster_file):
+    with rasterio.open(raster_file) as src:
+        row, col = src.index(x, y)
+        soil_val = src.read(1, window=((row, row + 1), (col, col + 1)))
+        print(f"{raster_file} content at point (): {soil_val[0][0]}")
+        return soil_val
+
+
+pointX, pointY = find_point(0)
+
+find_soil(pointX, pointY, "soil_moisture.tif")
