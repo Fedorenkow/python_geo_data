@@ -1,5 +1,6 @@
 import rasterio
 import geopandas as gpd
+from shapely import Point
 
 
 def find_point(point):
@@ -19,7 +20,18 @@ def find_soil(x, y, raster_file):
 
 pointX, pointY = find_point(0)
 
-clay = find_soil(pointX, pointY, "./soil_data/clay.tif")
-sand = find_soil(pointX, pointY, "./soil_data/sand.tif")
-density = find_soil(pointX, pointY, "./soil_data/density.tif")
-soil_moisture = find_soil(pointX, pointY, "soil_moisture.tif")
+ball = Point(pointX, pointY)
+
+clay = find_soil(pointX, pointY, "./soil_data/clay.tif")[0][0]
+sand = find_soil(pointX, pointY, "./soil_data/sand.tif")[0][0]
+density = find_soil(pointX, pointY, "./soil_data/density.tif")[0][0]
+soil_moisture = find_soil(pointX, pointY, "soil_moisture.tif")[0][0]
+
+data_soil = {
+    "clay": clay,
+    "sand": sand,
+    "density": density,
+    "soil_moisture": soil_moisture}
+
+soils = gpd.GeoDataFrame([data_soil], geometry=[ball])
+soils.to_file("output.geojson", driver="GeoJSON")
