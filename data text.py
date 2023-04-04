@@ -21,4 +21,7 @@ def find_soil(x, y, raster_file):
 
 pointX, pointY = find_point(0)
 
-find_soil(pointX, pointY, "soil_moisture.tif")
+clay = find_soil(pointX, pointY, "./soil_data/clay.tif")
+sand = find_soil(pointX, pointY, "./soil_data/sand.tif")
+density = find_soil(pointX, pointY, "./soil_data/density.tif")
+soil_moisture = find_soil(pointX, pointY, "soil_moisture.tif")
