@@ -56,7 +56,6 @@ for i in range(1, 40):
     }
     gdf = gpd.GeoDataFrame(data=[properties], geometry=[ball])
     gdf.to_file('result.geojson', driver='GeoJSON', newline='\n')
-    gdf.to_file('result.geojson', driver='GeoJSON', newline='\n')
     with open('result.geojson', "a") as f:
         properties = {
             'id': id_json,
